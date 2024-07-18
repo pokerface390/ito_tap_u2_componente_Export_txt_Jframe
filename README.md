@@ -37,3 +37,10 @@ Guardar Datos: Guarda los datos de la tabla en un archivo .txt especificado por 
 Cambiar Títulos: Permite al usuario cambiar los títulos de las columnas de la tabla.
 Actualización de Archivos: Actualiza automáticamente el archivo de texto cuando se modifican los datos o títulos de la tabla.
 Este resumen proporciona una visión general y los pasos necesarios para integrar tu componente visual en NetBeans, asegurando que esté disponible para su uso y configuración dentro del entorno de desarrollo.
+ 
+ 
+  
+ 
+   
+ 
+  
