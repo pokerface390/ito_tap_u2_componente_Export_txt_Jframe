@@ -1,4 +1,5 @@
 Para integrar tu componente ComponenteVisual en la paleta de componentes de NetBeans y resumir su funcionalidad y configuración:
+![image](https://github.com/user-attachments/assets/db1f846a-117d-4197-b9de-1a314af54f46)
 
 Paquete y Importaciones
 Paquete: El componente se encuentra en el paquete components.
