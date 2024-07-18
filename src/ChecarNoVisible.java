@@ -2,7 +2,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class MainApp {
+public class ChecarNoVisible {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -18,7 +18,7 @@ public class MainApp {
                 frame.add(buttonPanel, BorderLayout.SOUTH);
 
                 frame.pack();
-                frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+                frame.setLocationRelativeTo(null); 
                 frame.setVisible(true);
             }
         });

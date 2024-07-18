@@ -1,10 +1,10 @@
 package components;
 
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +24,11 @@ public class ComponenteVisual extends JPanel {
         JButton botonCambiarTitulos = new JButton("Cambiar Títulos");
         JButton botonEliminarFila = new JButton("Eliminar Fila Seleccionada");
 
-        botonCargar.addActionListener(new EscuchaCargar());
-        botonAgregarFila.addActionListener(new EscuchaAgregarFila());
-        botonGuardar.addActionListener(new EscuchaGuardar());
-        botonCambiarTitulos.addActionListener(new EscuchaCambiarTitulos());
-        botonEliminarFila.addActionListener(new EscuchaEliminarFila());
+        botonCargar.addActionListener(this::cargarArchivoAction);
+        botonAgregarFila.addActionListener(this::agregarFilaAction);
+        botonGuardar.addActionListener(this::guardarAction);
+        botonCambiarTitulos.addActionListener(this::cambiarTitulosAction);
+        botonEliminarFila.addActionListener(this::eliminarFilaAction);
 
         panelControl.add(botonCargar);
         panelControl.add(botonAgregarFila);
@@ -44,9 +44,7 @@ public class ComponenteVisual extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-   private class EscuchaCargar implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    private void cargarArchivoAction(ActionEvent e) {
         JFileChooser fileChooser = new JFileChooser();
         int resultado = fileChooser.showOpenDialog(ComponenteVisual.this);
         if (resultado == JFileChooser.APPROVE_OPTION) {
@@ -54,48 +52,46 @@ public class ComponenteVisual extends JPanel {
             cargarArchivo(rutaArchivoActual);
         }
     }
-}
 
-private void cargarArchivo(String rutaArchivo) {
-    try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
-        String linea;
-        List<String[]> datos = new ArrayList<>();
-        while ((linea = br.readLine()) != null) {
-            datos.add(linea.split(","));
-        }
+    private void cargarArchivo(String rutaArchivo) {
+        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+            String linea;
+            List<String[]> datos = new ArrayList<>();
+            while ((linea = br.readLine()) != null) {
+                datos.add(linea.split(","));
+            }
 
-        if (datos.isEmpty() || datos.get(0).length == 0) {
-            int opcion = JOptionPane.showConfirmDialog(this,
-                    "El archivo TXT está vacío. ¿Desea agregar dos filas nuevas?",
-                    "Archivo Vacío",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE);
+            if (datos.isEmpty() || datos.get(0).length == 0) {
+                int opcion = JOptionPane.showConfirmDialog(this,
+                        "El archivo TXT está vacío. ¿Desea agregar dos filas nuevas?",
+                        "Archivo Vacío",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
 
-            if (opcion == JOptionPane.YES_OPTION) {
-                String[] nuevosTitulos = solicitarTitulos();
-                modeloTabla.setDataVector(new Object[2][nuevosTitulos.length], nuevosTitulos);
-                for (int i = 0; i < 2; i++) {
-                    for (int j = 0; j < nuevosTitulos.length; j++) {
-                        String valor = JOptionPane.showInputDialog(this,
-                                "Ingrese el valor para la columna " + nuevosTitulos[j] + " en la fila " + (i + 1));
-                        modeloTabla.setValueAt(valor, i, j);
+                if (opcion == JOptionPane.YES_OPTION) {
+                    String[] nuevosTitulos = solicitarTitulos();
+                    modeloTabla.setDataVector(new Object[1][nuevosTitulos.length], nuevosTitulos);
+                    for (int i = 0; i < 1; i++) {
+                        for (int j = 0; j < nuevosTitulos.length; j++) {
+                            String valor = JOptionPane.showInputDialog(this,
+                                    "Ingrese el valor para la columna " + nuevosTitulos[j] + " en la fila " + (i + 1));
+                            modeloTabla.setValueAt(valor, i, j);
+                        }
+                    }
+                    if (rutaArchivoActual != null) {
+                        guardarEnArchivo(rutaArchivoActual);
                     }
                 }
-                if (rutaArchivoActual != null) {
-                    guardarEnArchivo(rutaArchivoActual);
-                }
+            } else {
+                String[] nombresColumnas = datos.get(0);
+                datos.remove(0);
+                String[][] datosTabla = datos.toArray(new String[0][]);
+                modeloTabla.setDataVector(datosTabla, nombresColumnas);
             }
-        } else {
-            String[] nombresColumnas = datos.get(0);
-            datos.remove(0);
-            String[][] datosTabla = datos.toArray(new String[0][]);
-            modeloTabla.setDataVector(datosTabla, nombresColumnas);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    } catch (IOException e) {
-        e.printStackTrace();
     }
-}
-
 
     private String[] solicitarTitulos() {
         int numColumnas = 0;
@@ -117,25 +113,19 @@ private void cargarArchivo(String rutaArchivo) {
         return titulos;
     }
 
-    private class EscuchaAgregarFila implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            modeloTabla.addRow(new Object[modeloTabla.getColumnCount()]);
-        }
+    private void agregarFilaAction(ActionEvent e) {
+        modeloTabla.addRow(new Object[modeloTabla.getColumnCount()]);
     }
 
-    private class EscuchaGuardar implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (rutaArchivoActual != null) {
+    private void guardarAction(ActionEvent e) {
+        if (rutaArchivoActual != null) {
+            guardarEnArchivo(rutaArchivoActual);
+        } else {
+            JFileChooser fileChooser = new JFileChooser();
+            int resultado = fileChooser.showSaveDialog(ComponenteVisual.this);
+            if (resultado == JFileChooser.APPROVE_OPTION) {
+                rutaArchivoActual = fileChooser.getSelectedFile().getAbsolutePath();
                 guardarEnArchivo(rutaArchivoActual);
-            } else {
-                JFileChooser fileChooser = new JFileChooser();
-                int resultado = fileChooser.showSaveDialog(ComponenteVisual.this);
-                if (resultado == JFileChooser.APPROVE_OPTION) {
-                    rutaArchivoActual = fileChooser.getSelectedFile().getAbsolutePath();
-                    guardarEnArchivo(rutaArchivoActual);
-                }
             }
         }
     }
@@ -156,43 +146,42 @@ private void cargarArchivo(String rutaArchivo) {
         }
     }
 
-    private class EscuchaCambiarTitulos implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String[] nombresColumnasActuales = new String[modeloTabla.getColumnCount()];
-            for (int i = 0; i < modeloTabla.getColumnCount(); i++) {
-                nombresColumnasActuales[i] = modeloTabla.getColumnName(i);
-            }
-            String[] nuevosTitulos = new String[modeloTabla.getColumnCount()];
-            for (int i = 0; i < modeloTabla.getColumnCount(); i++) {
-                nuevosTitulos[i] = JOptionPane.showInputDialog(ComponenteVisual.this,
-                        "Ingrese el nuevo título para la columna " + (i + 1),
-                        modeloTabla.getColumnName(i));
-            }
+    private void cambiarTitulosAction(ActionEvent e) {
+    int numColumnas = modeloTabla.getColumnCount();
+    String[] nuevosTitulos = new String[numColumnas];
 
-            Object[][] nuevosDatos = new Object[modeloTabla.getRowCount() + 1][modeloTabla.getColumnCount()];
-            for (int i = 0; i < modeloTabla.getRowCount() + 1; i++) {
-                if (i == 0) {
-                    for (int j = 0; j < modeloTabla.getColumnCount(); j++) {
-                        nuevosDatos[i][j] = nombresColumnasActuales[j];
-                    }
-                } else {
-                    for (int j = 0; j < modeloTabla.getColumnCount(); j++) {
-                        nuevosDatos[i][j] = modeloTabla.getValueAt(i - 1, j);
-                    }
-                }
-            }
+    for (int i = 0; i < numColumnas; i++) {
+        nuevosTitulos[i] = JOptionPane.showInputDialog(ComponenteVisual.this,
+                "Ingrese el nuevo título para la columna " + (i + 1),
+                modeloTabla.getColumnName(i));
+    }
 
-            modeloTabla.setDataVector(nuevosDatos, nuevosTitulos);
+    modeloTabla.setColumnIdentifiers(nuevosTitulos);
 
-            if (rutaArchivoActual != null) {
-                actualizarArchivoDespuesCambioTitulos(rutaArchivoActual, nuevosTitulos, nuevosDatos);
-            } else {
-                JOptionPane.showMessageDialog(ComponenteVisual.this,
-                        "Primero cargue un archivo TXT para agregar títulos.");
+    if (rutaArchivoActual != null) {
+        actualizarArchivoDespuesCambioTitulos(rutaArchivoActual, nuevosTitulos);
+    } else {
+        JOptionPane.showMessageDialog(ComponenteVisual.this,
+                "Primero cargue un archivo TXT para agregar títulos.");
+    }
+}
+
+private void actualizarArchivoDespuesCambioTitulos(String rutaArchivo, String[] nuevosTitulos) {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
+        for (int i = 0; i < nuevosTitulos.length; i++) {
+            bw.write(nuevosTitulos[i] + (i < nuevosTitulos.length - 1 ? "," : "\n"));
+        }
+        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+            for (int j = 0; j < modeloTabla.getColumnCount(); j++) {
+                bw.write(modeloTabla.getValueAt(i, j) == null ? "" : modeloTabla.getValueAt(i, j).toString());
+                bw.write(j < modeloTabla.getColumnCount() - 1 ? "," : "\n");
             }
         }
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
+
 
     private void actualizarArchivoDespuesCambioTitulos(String rutaArchivo, String[] nuevosTitulos, Object[][] nuevosDatos) {
         try (FileWriter fw = new FileWriter(rutaArchivo)) {
@@ -210,78 +199,51 @@ private void cargarArchivo(String rutaArchivo) {
         }
     }
 
-    private class EscuchaEliminarFila implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] filasSeleccionadas = tabla.getSelectedRows();
-            if (filasSeleccionadas.length > 0) {
-                for (int i = filasSeleccionadas.length - 1; i >= 0; i--) {
-                    modeloTabla.removeRow(filasSeleccionadas[i]);
-                }
-
-                if (rutaArchivoActual != null) {
-                    actualizarArchivoDespuesEliminarFilas(rutaArchivoActual, filasSeleccionadas);
-                }
-            } else {
-                JOptionPane.showMessageDialog(ComponenteVisual.this,
-                        "Seleccione una o más filas para eliminar.");
-            }
-        }
-
-        private void actualizarArchivoDespuesEliminarFilas(String rutaArchivo, int[] filasAEliminar) {
-            List<String> lineas = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
-                String linea;
-                while ((linea = br.readLine()) != null) {
-                    lineas.add(linea);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+    private void eliminarFilaAction(ActionEvent e) {
+        int[] filasSeleccionadas = tabla.getSelectedRows();
+        if (filasSeleccionadas.length > 0) {
+            for (int i = filasSeleccionadas.length - 1; i >= 0; i--) {
+                modeloTabla.removeRow(filasSeleccionadas[i]);
             }
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
-                for (int i = 0; i < lineas.size(); i++) {
-                    if (!esLineaAEliminar(i, filasAEliminar)) {
-                        bw.write(lineas.get(i));
-                        bw.newLine();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (rutaArchivoActual != null) {
+                actualizarArchivoDespuesEliminarFilas(rutaArchivoActual, filasSeleccionadas);
             }
-        }
-
-        private boolean esLineaAEliminar(int lineaActual, int[] filasAEliminar) {
-            for (int fila : filasAEliminar) {
-                if (lineaActual == fila + 1) {
-                    return true;
-                }
-            }
-            return false;
+        } else {
+            JOptionPane.showMessageDialog(ComponenteVisual.this,
+                    "Seleccione una o más filas para eliminar.");
         }
     }
 
-    public DefaultTableModel getModeloTabla() {
-        return modeloTabla;
+    private void actualizarArchivoDespuesEliminarFilas(String rutaArchivo, int[] filasAEliminar) {
+        List<String> lineas = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                lineas.add(linea);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
+            for (int i = 0; i < lineas.size(); i++) {
+                if (!esLineaAEliminar(i, filasAEliminar)) {
+                    bw.write(lineas.get(i));
+                    bw.newLine();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setModeloTabla(DefaultTableModel modeloTabla) {
-        this.modeloTabla = modeloTabla;
-    }
-
-    public JTable getTabla() {
-        return tabla;
-    }
-
-    public void setTabla(JTable tabla) {
-        this.tabla = tabla;
-    }
-
-    public String getRutaArchivoActual() {
-        return rutaArchivoActual;
-    }
-
-    public void setRutaArchivoActual(String rutaArchivoActual) {
-        this.rutaArchivoActual = rutaArchivoActual;
+    private boolean esLineaAEliminar(int lineaActual, int[] filasAEliminar) {
+        for (int fila : filasAEliminar) {
+            if (lineaActual == fila + 1) {
+                return true;
+            }
+        }
+        return false;
     }
 }
