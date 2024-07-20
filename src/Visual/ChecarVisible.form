@@ -41,7 +41,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="components.ComponenteVisual" name="componenteVisual1">
+    <Component class="Visual.ComponenteVisual" name="componenteVisual1">
     </Component>
   </SubComponents>
 </Form>

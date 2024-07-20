@@ -1,3 +1,5 @@
+package Visual;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -19,7 +21,7 @@ public class ChecarVisible extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        componenteVisual1 = new components.ComponenteVisual();
+        componenteVisual1 = new Visual.ComponenteVisual();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -79,6 +81,6 @@ public class ChecarVisible extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private components.ComponenteVisual componenteVisual1;
+    private Visual.ComponenteVisual componenteVisual1;
     // End of variables declaration//GEN-END:variables
 }

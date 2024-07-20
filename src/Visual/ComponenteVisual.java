@@ -1,5 +1,4 @@
-package components;
-
+package Visual;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
